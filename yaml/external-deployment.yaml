@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: external
-        image: deepakdinio/git_devops_external:2
+        image: deepakdinio/devops-bootcamp-external:1
         env:
           - name: SERVER
             value: 'http://internal-service.demo:7777'
