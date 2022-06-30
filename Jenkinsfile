@@ -58,7 +58,7 @@ pipeline {
             steps {
                 echo 'Get cluster credentials'
                 sh 'gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project roidtc-june22-u104'
-                sh "kubectl set image deployment/external-deployment events-external=${env.imageName}:${env.BUILD_ID}"
+                sh "kubectl set image deployment/external-deployment external=${env.imageName}:${env.BUILD_ID}"
 
              }
         }     
