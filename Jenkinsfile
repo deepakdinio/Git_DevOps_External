@@ -2,7 +2,7 @@ pipeline {
     agent any 
     environment {
         registryCredential = 'dockerhubcredential'
-        imageName = 'deepakdinio/Git_DevOps_External'
+        imageName = 'deepakdinio/git_devops_external'
         dockerImage = ''
         }
     stages {
