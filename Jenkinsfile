@@ -36,7 +36,7 @@ pipeline {
                     echo 'image built'
                 }
             }
-            }
+        }
         stage('Push Image') {
             steps{
                 script {
