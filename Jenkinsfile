@@ -15,23 +15,32 @@ pipeline {
                 }
             }
             steps {
-                echo 'Retrieve source from github. run npm install and npm test' 
+                echo 'Retrieve source from github. run npm install and npm test'
+                git branch 'master', url:  'https://github.com/deepakdinio/Git_DevOps_External.git'
+                echo 'showing files from repo?' 
+                sh 'ls -a'
+                echo 'install dependencies' 
+                sh 'npm install'
+                echo 'Run tests'
+                sh 'npm test'
+                echo 'Testing completed'
             }
         }
         stage('Building image') {
             steps{
                 script {
                     echo 'build the image'
-                    docker.build $(environment.imageName):$(environment.BUILD_NUMBER)
-                    echo "build complete"
+                     dockerImage = docker.build("${env.imageName}:${env.BUILD_ID}")
+                    echo 'image built'
                 }
             }
             }
         stage('Push Image') {
             steps{
                 script {
-                    echo 'push the image to docker hub'
-                    docker.push $(environment.imageName):$(environment.BUILD_NUMBER)
+                    echo 'pushing the image to docker hub' 
+                    docker.withRegistry('',registryCredential){
+                    dockerImage.push("${env.BUILD_ID}")
                     
                 }
             }
@@ -45,6 +54,9 @@ pipeline {
                         }
                     }
             steps {
+                echo 'Get cluster credentials'
+                sh 'gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project roidtc-june22-u104'
+                sh "kubectl set image deployment/external-deployment events-external=${env.imageName}:${env.BUILD_ID} --namespace=events"
              }
         }     
         stage('Remove local docker image') {
