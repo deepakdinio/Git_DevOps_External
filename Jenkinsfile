@@ -2,21 +2,23 @@ pipeline {
     agent any 
     environment {
         registryCredential = 'dockerhubcredential'
-        imageName = 'deepakdinio/devops-bootcamp-external'
+        imageName = 'deepakdinio/Git_DevOps_External'
         dockerImage = ''
         }
     stages {
         stage('Run the tests') {
              agent {
                 docker { 
-                    image 'node:18-alpine3.15'
+                    image 'node:18-alpine'
                     args '-e HOME=/tmp -e NPM_CONFIG_PREFIX=/tmp/.npm'
                     reuseNode true
                 }
             }
             steps {
-                echo 'Retrieve source from github. run npm install and npm test'
-                git branch 'master', url:  'https://github.com/deepakdinio/Git_DevOps_External.git'
+                echo 'Retrieve source from github' 
+                git branch: 'master',
+                    url: 'https://github.com/deepakdinio/Git_DevOps_External.git'
+
                 echo 'showing files from repo?' 
                 sh 'ls -a'
                 echo 'install dependencies' 
@@ -29,8 +31,8 @@ pipeline {
         stage('Building image') {
             steps{
                 script {
-                    echo 'build the image'
-                     dockerImage = docker.build("${env.imageName}:${env.BUILD_ID}")
+                    echo 'building image' 
+                    dockerImage = docker.build("${env.imageName}:${env.BUILD_ID}")
                     echo 'image built'
                 }
             }
@@ -40,8 +42,8 @@ pipeline {
                 script {
                     echo 'pushing the image to docker hub' 
                     docker.withRegistry('',registryCredential){
-                    dockerImage.push("${env.BUILD_ID}")
-                    
+                        dockerImage.push("${env.BUILD_ID}")
+                    }
                 }
             }
         }     
@@ -57,12 +59,14 @@ pipeline {
                 echo 'Get cluster credentials'
                 sh 'gcloud container clusters get-credentials cluster-1 --zone us-central1-c --project roidtc-june22-u104'
                 sh "kubectl set image deployment/external-deployment events-external=${env.imageName}:${env.BUILD_ID} --namespace=events"
+
              }
         }     
         stage('Remove local docker image') {
             steps{
-                sh "docker rmi $imageName:latest"
-                sh "docker rmi $imageName:$BUILD_NUMBER"
+                echo "pending"
+
+                sh "docker rmi ${env.imageName}:${env.BUILD_ID}"
             }
         }
     }
